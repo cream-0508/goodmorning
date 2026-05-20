@@ -5,6 +5,8 @@ require_once "db.php";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") { // post 방식으로 받으면?
+    verify_csrf_token();
+
     $username = trim($_POST["username"] ?? ""); 
     $password = $_POST["password"] ?? "";
     // 포스트로 받은거 username, pw 넣고 비면 에러
@@ -54,6 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") { // post 방식으로 받으면?
             <?php endif; ?>
 
             <form method="post" action="login.php">
+                <?= csrf_field() ?>
+
                 <div class="form-group">
                     <label>아이디</label>
                     <input

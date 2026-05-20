@@ -4,6 +4,8 @@ require_once "db.php";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf_token();
+
     $username = trim($_POST["username"] ?? "");
     $password = $_POST["password"] ?? "";
 
@@ -60,6 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
 
             <form method="post" action="register.php">
+                <?= csrf_field() ?>
+
                 <div class="form-group">
                     <label>아이디</label>
                     <input

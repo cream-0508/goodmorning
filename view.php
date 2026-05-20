@@ -92,6 +92,7 @@ $isAuthor = isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post["user_i
                         <a class="btn btn-primary" href="edit.php?id=<?= htmlspecialchars($post["id"]) ?>">수정</a>
 
                         <form method="post" action="delete.php" style="display:inline;">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= htmlspecialchars($post["id"]) ?>">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">
                                 삭제
@@ -159,6 +160,7 @@ $isAuthor = isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post["user_i
                                         </a>
 
                                         <form method="post" action="comment_delete.php" style="display:inline;">
+                                            <?= csrf_field() ?>
                                             <input type="hidden" name="id" value="<?= htmlspecialchars($comment["id"]) ?>">
                                             <button type="submit" class="btn btn-danger" onclick="return confirm('댓글을 삭제하시겠습니까?')">
                                                 댓글 삭제
@@ -176,6 +178,7 @@ $isAuthor = isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post["user_i
                         <h4>댓글 작성</h4>
 
                         <form method="post" action="comment_add.php">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="post_id" value="<?= htmlspecialchars($post["id"]) ?>">
 
                             <div class="form-group">

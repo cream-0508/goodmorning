@@ -12,6 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     die("잘못된 요청 방식입니다.");
 }
 
+verify_csrf_token();
+
 $post_id = $_POST["post_id"] ?? 0;
 $content = trim($_POST["content"] ?? "");
 

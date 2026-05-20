@@ -38,6 +38,8 @@ if ($comment["user_id"] != $_SESSION["user_id"]) {
 $error = "";
 //post 요청으로 받았을 시에 내용 변경 넘겨받고 sql로 업데이트
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    verify_csrf_token();
+
     $content = trim($_POST["content"] ?? "");
 
     if ($content === "") {
@@ -81,6 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
 
             <form method="post" action="comment_edit.php?id=<?= htmlspecialchars($comment["id"]) ?>">
+                <?= csrf_field() ?>
+
                 <div class="form-group">
                     <label>댓글 내용</label>
                     <textarea

@@ -11,6 +11,8 @@ require_once "db.php";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {//post 요청일 경우,
+    verify_csrf_token();
+
     $title = trim($_POST["title"] ?? ""); //값이 없으면 빈 문자열
     $content = trim($_POST["content"] ?? "");
     $user_id = $_SESSION["user_id"];
@@ -35,11 +37,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {//post 요청일 경우,
 
             // 3. 파일이 업로드되었으면 처리
             if (isset($_FILES["upload_file"]) && $_FILES["upload_file"]["error"] === UPLOAD_ERR_OK) {
+                  if ($_FILES["upload_file"]["error"] !== UPLOAD_ERR_OK) {
+                       throw new Exception("파일 업로드 중 오류가 발생했습니다.");
+                      }
                 $originalName = $_FILES["upload_file"]["name"];
                 $tmpName = $_FILES["upload_file"]["tmp_name"];
                 $fileSize = $_FILES["upload_file"]["size"];
 
-                $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                // 1. 파일 크기 제한: 5MB
+                 $maxFileSize = 5 * 1024 * 1024;
+
+                 if ($fileSize > $maxFileSize) {
+                    throw new Exception("파일 크기는 5MB 이하만 업로드할 수 있습니다.");
+                  }
+                  // 2. 확장자 검사
+                 $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+                 $allowedExtensions = ["jpg", "jpeg", "png", "gif", "pdf", "txt", "zip"];
+
+                 if (!in_array($ext, $allowedExtensions, true)) {
+                        throw new Exception("허용되지 않는 파일 확장자입니다.");
+                  }
+
+                 // 3. MIME 타입 검사
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->file($tmpName);
+
+                    $allowedMimeTypes = [
+                        "jpg"  => ["image/jpeg"],
+                        "jpeg" => ["image/jpeg"],
+                        "png"  => ["image/png"],
+                        "gif"  => ["image/gif"],
+                        "pdf"  => ["application/pdf"],
+                        "txt"  => ["text/plain"],
+                        "zip"  => ["application/zip", "application/x-zip-compressed"]
+                    ];
+
+                  if (!isset($allowedMimeTypes[$ext]) || !in_array($mimeType, $allowedMimeTypes[$ext], true)) {
+                     throw new Exception("파일 확장자와 실제 파일 형식이 일치하지 않습니다.");
+                  }
 
                 if ($ext !== "") {
                     $storedName = time() . "_" . bin2hex(random_bytes(8)) . "." . $ext;
@@ -112,6 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {//post 요청일 경우,
             <?php endif; ?>
 
             <form method="post" action="write.php" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+
                 <div class="form-group">
                     <label>제목</label>
                     <input

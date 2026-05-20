@@ -12,6 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     die("잘못된 요청 방식입니다.");
 }
 
+verify_csrf_token();
+
 $id = $_POST["id"] ?? 0;
 //직접 url 접근 방지
 if (!ctype_digit((string)$id)) {
